@@ -1,3 +1,7 @@
 /main.build/*
 /main.dist/*
 /main.onefile-build/*
+__pycache__/
+GetWaifu.exe
+test.py
+/resource/*

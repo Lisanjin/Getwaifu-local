@@ -31,6 +31,8 @@ class Ui_game_detail_deepone(object):
         self.comboBox.setObjectName("comboBox")
         self.textEdit = QtWidgets.QTextEdit(parent=game_detail_deepone)
         self.textEdit.setGeometry(QtCore.QRect(45, 90, 150, 32))
+        self.textEdit.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.textEdit.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.textEdit.setObjectName("textEdit")
         self.review_button = QtWidgets.QPushButton(parent=game_detail_deepone)
         self.review_button.setGeometry(QtCore.QRect(40, 210, 75, 23))
