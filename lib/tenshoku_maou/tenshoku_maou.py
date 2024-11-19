@@ -11,10 +11,10 @@ from PIL import Image
 class Tenshoku_Maou_Utils():
 
     def __init__(self):
-        self.cdn_url = self.get_cdn()
+        # self.updata_master()
+        
         self.MATSTER_DATA = json.loads(open("./lib/tenshoku_maou/config.json", 'r', encoding='UTF-8').read())
-        if self.MATSTER_DATA["version"] != self.cdn_url.split("/")[-2]:
-            self.updata_master()
+        self.cdn_url = self.MATSTER_DATA["cdn_url"]
 
         self.asset_type = ["text", "json", "wasm", "sprite", "font", "material", "texture", "audio", "textureatlas", "template", "script"]
         self.basisu_path = "./lib/tenshoku_maou/basisu.exe"
@@ -60,10 +60,12 @@ class Tenshoku_Maou_Utils():
 
     def updata_master(self):
         print("updata_master")
+        self.cdn_url = self.get_cdn()
         print(self.cdn_url+"config.json")
         respones = requests.get(self.cdn_url+"config.json")
         if respones.status_code == 200:
             master_data = json.loads(respones.text)
+            master_data["cdn_url"] = self.cdn_url
             master_data["version"] = self.cdn_url.split("/")[-2]
 
             with open("./lib/tenshoku_maou/config.json", 'w', encoding='UTF-8') as file:

@@ -101,6 +101,16 @@ class Deepone_Utils():
                         resource_list.append({
                             k: get_url(k)
                         })
+            elif type == 'specialRoom':
+                # specialRoom/4037001/image/sp_room_list_A.png
+                resource_path = "specialRoom/"+path+"/image/sp_room_list_A.png"
+                sp_room_path = "specialRoom/"+path
+                for k,v in self.MATSTER_DATA["assets"].items():
+                    if sp_room_path in k:
+                        resource_list.append({
+                            k: get_url(k)
+                        })
+
 
         except:
             print("路径错误")

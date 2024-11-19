@@ -16,6 +16,7 @@ from ui.main_window import Ui_MainWindow
 from ui.game_detail_deepone import Ui_game_detail_deepone
 from ui.game_detail_minashigo import Ui_game_detail_minashigo
 from ui.game_detail_tenshoku_maou import Ui_game_detail_tenshoku_maou
+from ui.game_detail_sirokurosangokusi import Ui_game_detail_sirokurosangokusi
 
 from ui.review_widget import Ui_review_widget
 from ui.audio_review_label import Ui_audio_review_label
@@ -27,6 +28,7 @@ from PyQt6.QtMultimedia import QMediaPlayer,QAudioOutput
 from lib.deepone import deepone
 from lib.minashigo import minashigo
 from lib.tenshoku_maou import tenshoku_maou
+from lib.sirokurosangokusi import sirokurosangokusi
 
 from qt_material import apply_stylesheet
 
@@ -56,10 +58,11 @@ class UpdataResourceThread(QThread):
 class DownloadThread(QThread):
     download_finished = pyqtSignal(str)
 
-    def __init__(self, resouce_dict, selected_game, parent=None):
+    def __init__(self, resouce_dict, selected_game,header=None, parent=None):
         super().__init__(parent)
         self.resouce_dict = resouce_dict
         self.selected_game = selected_game
+        self.header = header
 
     def run(self):
         try:
@@ -71,7 +74,11 @@ class DownloadThread(QThread):
             def dl_file(url, file_name):
                 print(f"downloading:{file_name}")
                 try:
-                    response = requests.get(url)
+                    if self.header is not None:
+                        print(self.header)
+                        response = requests.get(url, headers=self.header)
+                    else:
+                        response = requests.get(url)
                     if response.status_code == 200:
                         directory = file_name.replace(file_name.split('/')[-1], '')
                         if not os.path.exists(directory):
@@ -114,7 +121,7 @@ class AutoCloseMessageBox():
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        self.GAME_LIST = ["deepone","minashigo","tenshoku_maou"]
+        self.GAME_LIST = ["deepone","minashigo","tenshoku_maou","sirokurosangokusi"]
         self.setupUi(self)
         self.initUI()
         
@@ -127,6 +134,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.initUI_game_detail_deepone_widget()
         self.initUI_game_detail_minashigo_widget()
         self.initUI_game_detail_tenshoku_maou_widget()
+        self.initUI_game_detail_sirokurosangokusi_widget()
 
         self.initUI_review_widget()
         self.initUI_audio_review_label()
@@ -197,7 +205,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.game_detail_deepone_widget.move(1280, 0)
 
-        self.ui_game_detail_deepone.comboBox.addItems(['卡面', 'MEMORIAL', '立绘',"寝室预览","BGM","spine","资源路径"])
+        self.ui_game_detail_deepone.comboBox.addItems(['卡面', 'MEMORIAL', '立绘',"寝室预览","BGM","spine","specialRoom","资源路径"])
         
         self.ui_game_detail_deepone.review_button.clicked.connect(self.review_deepone)
         self.ui_game_detail_deepone.download_button.clicked.connect(self.download)
@@ -237,7 +245,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.ui_game_detail_tenshoku_maou.review_button.clicked.connect(self.review_tenshoku_maou)
         self.ui_game_detail_tenshoku_maou.updateRes.clicked.connect(lambda: self.update_resource(self.tenshoku_maou_utils,self.ui_game_detail_tenshoku_maou))
+    
+    def initUI_game_detail_sirokurosangokusi_widget(self):
+        self.game_detail_sirokurosangokusi_widget = QWidget(self)  # 创建 QWidget 容器
+        self.ui_game_detail_sirokurosangokusi = Ui_game_detail_sirokurosangokusi()   # 创建 Ui_game_detail 实例
+        self.ui_game_detail_sirokurosangokusi.setupUi(self.game_detail_sirokurosangokusi_widget)
 
+        self.sirokurosangokusi_utils = sirokurosangokusi.Sirokurosangokusi_Utils()
+
+        self.ui_game_detail_sirokurosangokusi.resouce_version.setText("资源表版本：" + self.sirokurosangokusi_utils.get_meta()["version"])
+        self.ui_game_detail_sirokurosangokusi.update_time.setText("上次更新时间：" + self.sirokurosangokusi_utils.get_meta()["update_time"])
+
+        self.game_detail_sirokurosangokusi_widget.move(1280, 0)
+
+        self.ui_game_detail_sirokurosangokusi.comboBox.addItems(["hs_anime","hs_cg","hs_voice","bgm","头像","立绘","立绘大","表情差分","资源路径"])
+
+        self.ui_game_detail_sirokurosangokusi.review_button.clicked.connect(self.review_sirokurosangokusi)
+        self.ui_game_detail_sirokurosangokusi.download_button.clicked.connect(self.download)
+        self.ui_game_detail_sirokurosangokusi.updateRes.clicked.connect(lambda: self.update_resource(self.sirokurosangokusi_utils,self.ui_game_detail_sirokurosangokusi))
 
     def show_game_detail(self,game_name):
 
@@ -293,6 +318,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             elif resouce_type == "立绘" or resouce_type == "卡面" or resouce_type == "MEMORIAL" or resouce_type == "寝室预览":
                 self.review_image(content)
             elif resouce_type == "spine":
+                self.review_image(content)
+            elif resouce_type == "specialRoom":
                 self.review_image(content)
             elif resouce_type == "资源路径":
                 if resouce_path.endswith(".mp3"):
@@ -354,7 +381,31 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         except Exception as e:
             print(e)
+    
+    def review_sirokurosangokusi(self):
+        try:
+            resouce_type = self.ui_game_detail_sirokurosangokusi.comboBox.currentText()
+            resouce_path = self.ui_game_detail_sirokurosangokusi.textEdit.toPlainText()
 
+            self.resouce_dict = self.sirokurosangokusi_utils.get_resource(resouce_type,resouce_path)
+
+            content = self.sirokurosangokusi_utils.download_single_file(self.resouce_dict['resource_url'])
+
+            if resouce_type in ["hs_anime","hs_cg","头像","立绘","立绘大","表情差分"]:
+                self.review_image(content)
+            elif resouce_type in ["bgm","hs_voice"]:
+                self.review_audio(content)
+            elif resouce_type == "资源路径":
+                if resouce_path.endswith(".png") or resouce_path.endswith(".jpg"):
+                    self.review_image(content)
+                elif resouce_path.endswith(".mp3") or resouce_path.endswith(".m4a"):
+                    self.review_audio(content)
+                else:
+                    pass
+            else:
+                pass
+        except Exception as e:
+            print(e)
 
     def download(self):
         if len(self.resouce_dict['resource_list']) == 1:
@@ -363,7 +414,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             AutoCloseMessageBox.show_information("开始批量下载，任务数："+str(len(self.resouce_dict['resource_list'])))
 
-        download_thread = DownloadThread(self.resouce_dict, self.selected_game)
+        if self.selected_game == "sirokurosangokusi":
+            header = self.sirokurosangokusi_utils.headers
+        else:
+            header = None
+
+        download_thread = DownloadThread(self.resouce_dict, self.selected_game,header)
         download_thread.download_finished.connect(self.show_download_complete_message)
         download_thread.start()
 
@@ -429,6 +485,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
+
+    app.setWindowIcon(QIcon("images/game_icon/window_logo.jpg"))
 
     apply_stylesheet(app, theme='dark_teal.xml')
 
