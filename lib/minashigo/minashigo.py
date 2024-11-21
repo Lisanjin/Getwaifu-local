@@ -145,7 +145,18 @@ class Minashigo_Utils():
                 resource_list.append({
                     resource_path: self.get_url(resource_path)
                 })
-
+            elif type == '战神Spine':
+                # spine/summon/304501/314501.png
+                
+                spine_path = "spine/summon/"+path+"/"
+                for k,v in self.MATSTER_DATA["assets"].items():
+                    if spine_path in k:
+                        if k.endswith(".png"):
+                            resource_path = k
+                        resource_list.append({
+                            k: self.get_url(k)
+                        })
+                
             elif type == 'BGM':
                 # sound/bgm/bgm_002.mp3
                 resource_path = "sound/bgm/"+path+".mp3"
@@ -167,6 +178,7 @@ class Minashigo_Utils():
             "resource_url": self.get_url(resource_path),
             "resource_list": resource_list
         }
+        print(resource_dict)
 
         return resource_dict
     

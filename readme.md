@@ -38,6 +38,7 @@ DeepOne
 | 战神卡面 | "image/summon/stand/"+path+"01.png"          | 全部以 "image/summon/stand/"+path开头内容   |image/summon/stand/**300101**01.png                    |
 | 寝室预览 | "image/episode/story/"+path+".png"           | 同预览                                       |image/episode/story/**110010101**.png                 |
 | bgm      | "sound/bgm/"+path+".mp3"                     | 同预览                                       |sound/bgm/**bgm010**.mp3                           |
+| spine    | "spine/summon/"+path+"/"+path+".png"        | 全部以 "spine/summon/"+path 开头内容         |spine/summon/**302701**/**302701**.png                     |
 | 资源路径 | path                                         | 同预览                                       |                                                 |
 
 转职魔王

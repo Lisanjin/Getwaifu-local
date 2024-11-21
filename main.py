@@ -223,7 +223,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.game_detail_minashigo_widget.move(1280, 0)
 
-        self.ui_game_detail_minashigo.comboBox.addItems(['角色卡面', '战神卡面', "寝室预览","BGM","资源路径"])
+        self.ui_game_detail_minashigo.comboBox.addItems(['角色卡面', '战神卡面', "寝室预览","战神Spine","BGM","资源路径"])
         
         self.ui_game_detail_minashigo.review_button.clicked.connect(self.review_minashigo)
         self.ui_game_detail_minashigo.download_button.clicked.connect(self.download)
@@ -350,6 +350,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.review_image(content)
             elif resouce_type == "BGM":
                 self.review_audio(content)
+            elif resouce_type == "战神Spine":
+                self.review_image(content)
             elif resouce_type == "资源路径":
                 if resouce_path.endswith(".png") or resouce_path.endswith(".jpg"):
                     self.review_image(content)
