@@ -10,6 +10,7 @@ deepone|download_res_hash.manifest
 孤儿|resource.json
 转职魔王 |config.json/names.json
 白黑三国志|resource.json
+童话边境|master_data.json
 
 
 
@@ -60,3 +61,10 @@ DeepOne
 |hs_anime      |"animation/h/"+path+"/h_"+path+"_001.jpg"   |所有"animation/h/"+path开头内容，不包含sp      |animation/h/**1100100_H01**/h_**1100100_H01**_128.jpg|
 |hs_cg          |"image/cg/cg_"+path+"_01.jpg"              |所有"image/cg/cg_"+path开头内容                |image/cg/cg_**1100100_H01**_02.jpg             |
 |hs_voice       |"sound/voice/"+path.split("_")[0]+"/voice_"+path+"_01.m4a"|所有"sound/voice/"+path.split("_")[0]+"/voice_"+path开头内容 |sound/voice/1100100/voice_**1100100_H01**_01.m4a|
+
+童话
+| 类型     | 预览内容                                     | 下载内容                                     |示例                      |
+|----------|----------------------------------------------|----------------------------------------------|-----------------------------------------------|
+|主页立绘差分| "chara/homestand/"+path包中_stand1.png| ab包中的MonoBehaviour、Sprite、Texture2D|chara/homestand/**18991**|
+|静态立绘|"chara/standimagelarge/+path包中 path.png|ab包中的Sprite、Texture2D|chara/standimagelarge/**18996**|
+|hs_cg|"chara/still/+path包中 最大的Texture2D|ab包中的MonoBehaviour、Sprite、Texture2D|chara/standimagelarge/**218991**|

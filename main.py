@@ -17,6 +17,7 @@ from ui.game_detail_deepone import Ui_game_detail_deepone
 from ui.game_detail_minashigo import Ui_game_detail_minashigo
 from ui.game_detail_tenshoku_maou import Ui_game_detail_tenshoku_maou
 from ui.game_detail_sirokurosangokusi import Ui_game_detail_sirokurosangokusi
+from ui.game_detail_otogi import Ui_game_detail_otogi
 
 from ui.review_widget import Ui_review_widget
 from ui.audio_review_label import Ui_audio_review_label
@@ -29,6 +30,7 @@ from lib.deepone import deepone
 from lib.minashigo import minashigo
 from lib.tenshoku_maou import tenshoku_maou
 from lib.sirokurosangokusi import sirokurosangokusi
+from lib.otogi import otogi
 
 from qt_material import apply_stylesheet
 
@@ -121,7 +123,7 @@ class AutoCloseMessageBox():
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        self.GAME_LIST = ["deepone","minashigo","tenshoku_maou","sirokurosangokusi"]
+        self.GAME_LIST = ["deepone","minashigo","tenshoku_maou","sirokurosangokusi","otogi"]
         self.setupUi(self)
         self.initUI()
         
@@ -135,6 +137,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.initUI_game_detail_minashigo_widget()
         self.initUI_game_detail_tenshoku_maou_widget()
         self.initUI_game_detail_sirokurosangokusi_widget()
+        self.initUI_game_detail_otogi_widget()
 
         self.initUI_review_widget()
         self.initUI_audio_review_label()
@@ -263,6 +266,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.ui_game_detail_sirokurosangokusi.review_button.clicked.connect(self.review_sirokurosangokusi)
         self.ui_game_detail_sirokurosangokusi.download_button.clicked.connect(self.download)
         self.ui_game_detail_sirokurosangokusi.updateRes.clicked.connect(lambda: self.update_resource(self.sirokurosangokusi_utils,self.ui_game_detail_sirokurosangokusi))
+    
+    def initUI_game_detail_otogi_widget(self):
+        self.ui_game_detail_otogi_widget = QWidget(self)  # 创建 QWidget 容器
+        self.ui_game_detail_otogi = Ui_game_detail_otogi()  # 创建 Ui_game_detail 实例
+        self.ui_game_detail_otogi.setupUi(self.ui_game_detail_otogi_widget)
+
+        self.otogi_utils = otogi.Otogi_Utils()
+
+        self.ui_game_detail_otogi.resouce_version.setText("资源表版本：" + self.otogi_utils.get_meta()["version"])
+        self.ui_game_detail_otogi.update_time.setText("上次更新时间：" + self.otogi_utils.get_meta()["update_time"])
+
+        self.ui_game_detail_otogi_widget.move(1280, 0)
+
+        self.ui_game_detail_otogi.comboBox.addItems(["主页立绘差分","静态立绘","hs_cg"])
+
+        self.ui_game_detail_otogi.review_button.clicked.connect(self.review_otogi)
+        self.ui_game_detail_otogi.updateRes.clicked.connect(lambda: self.update_resource(self.otogi_utils,self.ui_game_detail_otogi))
 
     def show_game_detail(self,game_name):
 
@@ -406,6 +426,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     pass
             else:
                 pass
+        except Exception as e:
+            print(e)
+    
+    def review_otogi(self):
+        try:
+            resouce_type = self.ui_game_detail_otogi.comboBox.currentText()
+            resouce_path = self.ui_game_detail_otogi.textEdit.toPlainText()
+
+            self.resouce_dict = self.otogi_utils.get_resource(resouce_type,resouce_path)
+
+            content = self.resouce_dict['content']
+
+            if content:
+                AutoCloseMessageBox.show_information("保存至："+self.resouce_dict['file_name'])
+
+                self.review_image(content)
+            
+        
         except Exception as e:
             print(e)
 
