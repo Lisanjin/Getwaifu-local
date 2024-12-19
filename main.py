@@ -124,6 +124,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.GAME_LIST = ["deepone","minashigo","tenshoku_maou","sirokurosangokusi","otogi"]
+        self.game_widget={}
+        self.game_ui={
+            "deepone":Ui_game_detail_deepone(),
+            "minashigo":Ui_game_detail_minashigo(),
+            "tenshoku_maou":Ui_game_detail_tenshoku_maou(),
+            "sirokurosangokusi":Ui_game_detail_sirokurosangokusi(),
+            "otogi":Ui_game_detail_otogi()
+        }
+        self.utils = {
+            "deepone":deepone.Deepone_Utils(),
+            "minashigo":minashigo.Minashigo_Utils(),
+            "tenshoku_maou":tenshoku_maou.Tenshoku_Maou_Utils(),
+            "sirokurosangokusi":sirokurosangokusi.Sirokurosangokusi_Utils(),
+            "otogi":otogi.Otogi_Utils()
+        }
+        self.game_item ={
+            "deepone":['卡面', 'MEMORIAL', '立绘',"寝室预览","BGM","spine","specialRoom","资源路径"],
+            "minashigo":['角色卡面', '战神卡面', "寝室预览","战神Spine","BGM","资源路径"],
+            "tenshoku_maou":["text", "json", "sprite", "texture", "audio", "textureatlas"],
+            "sirokurosangokusi":["hs_anime","hs_cg","hs_voice","bgm","头像","立绘","立绘大","表情差分","资源路径"],
+            "otogi":["主页立绘差分","静态立绘","hs_cg"]
+        }
         self.setupUi(self)
         self.initUI()
         
@@ -133,11 +155,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         
         self.initUI_game_button()
-        self.initUI_game_detail_deepone_widget()
-        self.initUI_game_detail_minashigo_widget()
-        self.initUI_game_detail_tenshoku_maou_widget()
-        self.initUI_game_detail_sirokurosangokusi_widget()
-        self.initUI_game_detail_otogi_widget()
+
+        self.initUI_game_detail()
+
 
         self.initUI_review_widget()
         self.initUI_audio_review_label()
@@ -195,95 +215,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 else:
                     game_button.setStyleSheet("border: none;")
 
-    
-    def initUI_game_detail_deepone_widget(self):
-        self.game_detail_deepone_widget = QWidget(self)  # 创建 QWidget 容器
-        self.ui_game_detail_deepone= Ui_game_detail_deepone()   # 创建 Ui_game_detail 实例
-        self.ui_game_detail_deepone.setupUi(self.game_detail_deepone_widget)
+    def initUI_game_detail(self):
+        for game in self.GAME_LIST:
+            self.game_widget[game] = QWidget(self)  # 创建 QWidget 容器
+            self.game_ui[game].setupUi(self.game_widget[game])
 
-        self.deepone_utils = deepone.Deepone_Utils()
+            self.game_ui[game].resouce_version.setText("资源表版本："+self.utils[game].get_meta()["version"])
+            self.game_ui[game].update_time.setText("上次更新时间："+self.utils[game].get_meta()["update_time"])
 
-        self.ui_game_detail_deepone.resouce_version.setText("资源表版本："+self.deepone_utils.get_meta()["version"])
-        self.ui_game_detail_deepone.update_time.setText("上次更新时间："+self.deepone_utils.get_meta()["update_time"])
+            self.game_widget[game].move(1280, 0)
 
-        self.game_detail_deepone_widget.move(1280, 0)
+            self.game_ui[game].comboBox.addItems(self.game_item[game])
 
-        self.ui_game_detail_deepone.comboBox.addItems(['卡面', 'MEMORIAL', '立绘',"寝室预览","BGM","spine","specialRoom","资源路径"])
-        
-        self.ui_game_detail_deepone.review_button.clicked.connect(self.review_deepone)
-        self.ui_game_detail_deepone.download_button.clicked.connect(self.download)
-        self.ui_game_detail_deepone.updateRes.clicked.connect(lambda: self.update_resource(self.deepone_utils,self.ui_game_detail_deepone))
-    
-    def initUI_game_detail_minashigo_widget(self):
-        self.game_detail_minashigo_widget = QWidget(self)  # 创建 QWidget 容器
-        self.ui_game_detail_minashigo = Ui_game_detail_minashigo()   # 创建 Ui_game_detail 实例
-        self.ui_game_detail_minashigo.setupUi(self.game_detail_minashigo_widget)
-
-        self.minashigo_utils = minashigo.Minashigo_Utils()
-
-        self.ui_game_detail_minashigo.resouce_version.setText("资源表版本：" + self.minashigo_utils.get_meta()["version"])
-        self.ui_game_detail_minashigo.update_time.setText("上次更新时间：" + self.minashigo_utils.get_meta()["update_time"])
-
-        self.game_detail_minashigo_widget.move(1280, 0)
-
-        self.ui_game_detail_minashigo.comboBox.addItems(['角色卡面', '战神卡面', "寝室预览","战神Spine","BGM","资源路径"])
-        
-        self.ui_game_detail_minashigo.review_button.clicked.connect(self.review_minashigo)
-        self.ui_game_detail_minashigo.download_button.clicked.connect(self.download)
-        self.ui_game_detail_minashigo.updateRes.clicked.connect(lambda: self.update_resource(self.minashigo_utils,self.ui_game_detail_minashigo))
-
-    def initUI_game_detail_tenshoku_maou_widget(self):
-        self.game_detail_tenshoku_maou_widget = QWidget(self)  # 创建 QWidget 容器
-        self.ui_game_detail_tenshoku_maou = Ui_game_detail_tenshoku_maou()   # 创建 Ui_game_detail 实例
-        self.ui_game_detail_tenshoku_maou.setupUi(self.game_detail_tenshoku_maou_widget)
-
-        self.tenshoku_maou_utils = tenshoku_maou.Tenshoku_Maou_Utils()
-
-        self.ui_game_detail_tenshoku_maou.resouce_version.setText("资源表版本：" + self.tenshoku_maou_utils.get_meta()["version"])
-        self.ui_game_detail_tenshoku_maou.update_time.setText("上次更新时间：" + self.tenshoku_maou_utils.get_meta()["update_time"])
-
-        self.game_detail_tenshoku_maou_widget.move(1280, 0)
-
-        self.ui_game_detail_tenshoku_maou.comboBox.addItems(["text", "json", "sprite", "texture", "audio", "textureatlas"])
-
-        self.ui_game_detail_tenshoku_maou.review_button.clicked.connect(self.review_tenshoku_maou)
-        self.ui_game_detail_tenshoku_maou.updateRes.clicked.connect(lambda: self.update_resource(self.tenshoku_maou_utils,self.ui_game_detail_tenshoku_maou))
-    
-    def initUI_game_detail_sirokurosangokusi_widget(self):
-        self.game_detail_sirokurosangokusi_widget = QWidget(self)  # 创建 QWidget 容器
-        self.ui_game_detail_sirokurosangokusi = Ui_game_detail_sirokurosangokusi()   # 创建 Ui_game_detail 实例
-        self.ui_game_detail_sirokurosangokusi.setupUi(self.game_detail_sirokurosangokusi_widget)
-
-        self.sirokurosangokusi_utils = sirokurosangokusi.Sirokurosangokusi_Utils()
-
-        self.ui_game_detail_sirokurosangokusi.resouce_version.setText("资源表版本：" + self.sirokurosangokusi_utils.get_meta()["version"])
-        self.ui_game_detail_sirokurosangokusi.update_time.setText("上次更新时间：" + self.sirokurosangokusi_utils.get_meta()["update_time"])
-
-        self.game_detail_sirokurosangokusi_widget.move(1280, 0)
-
-        self.ui_game_detail_sirokurosangokusi.comboBox.addItems(["hs_anime","hs_cg","hs_voice","bgm","头像","立绘","立绘大","表情差分","资源路径"])
-
-        self.ui_game_detail_sirokurosangokusi.review_button.clicked.connect(self.review_sirokurosangokusi)
-        self.ui_game_detail_sirokurosangokusi.download_button.clicked.connect(self.download)
-        self.ui_game_detail_sirokurosangokusi.updateRes.clicked.connect(lambda: self.update_resource(self.sirokurosangokusi_utils,self.ui_game_detail_sirokurosangokusi))
-    
-    def initUI_game_detail_otogi_widget(self):
-        self.ui_game_detail_otogi_widget = QWidget(self)  # 创建 QWidget 容器
-        self.ui_game_detail_otogi = Ui_game_detail_otogi()  # 创建 Ui_game_detail 实例
-        self.ui_game_detail_otogi.setupUi(self.ui_game_detail_otogi_widget)
-
-        self.otogi_utils = otogi.Otogi_Utils()
-
-        self.ui_game_detail_otogi.resouce_version.setText("资源表版本：" + self.otogi_utils.get_meta()["version"])
-        self.ui_game_detail_otogi.update_time.setText("上次更新时间：" + self.otogi_utils.get_meta()["update_time"])
-
-        self.ui_game_detail_otogi_widget.move(1280, 0)
-
-        self.ui_game_detail_otogi.comboBox.addItems(["主页立绘差分","静态立绘","hs_cg"])
-
-        self.ui_game_detail_otogi.review_button.clicked.connect(self.review_otogi)
-        self.ui_game_detail_otogi.updateRes.clicked.connect(lambda: self.update_resource(self.otogi_utils,self.ui_game_detail_otogi))
-
+            self.game_ui[game].review_button.clicked.connect(partial(self.review_game,game))
+            if hasattr(self.game_ui[game], 'download_button'):
+                self.game_ui[game].download_button.clicked.connect(self.download)
+            self.game_ui[game].updateRes.clicked.connect(lambda: self.update_resource(self.utils[game],self.game_ui[game]))
+            
     def show_game_detail(self,game_name):
 
         for game in self.GAME_LIST:
@@ -323,15 +271,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         update_thread.finished.connect(update_thread.quit)
         update_thread.finished.connect(update_thread.wait)
 
+    def review_game(self,game_name):
+        if game_name == "deepone":
+            self.review_deepone()
+        elif game_name == "minashigo":
+            self.review_minashigo()
+        elif game_name == "tenshoku_maou":
+            self.review_tenshoku_maou()
+        elif game_name == "sirokurosangokusi":
+            self.review_sirokurosangokusi()
+        elif game_name == "otogi":
+            self.review_otogi()
+
     
     def review_deepone(self):
         try:
-            resouce_type = self.ui_game_detail_deepone.comboBox.currentText()
-            resouce_path = self.ui_game_detail_deepone.textEdit.toPlainText()
+            resouce_type = self.game_ui["deepone"].comboBox.currentText()
+            resouce_path = self.game_ui["deepone"].textEdit.toPlainText()
 
-            self.resouce_dict = self.deepone_utils.get_resource(resouce_type,resouce_path)
+            self.resouce_dict = self.utils["deepone"].get_resource(resouce_type,resouce_path)
 
-            content = self.deepone_utils.download_single_file(self.resouce_dict['resource_url'])
+            content = self.utils["deepone"].download_single_file(self.resouce_dict['resource_url'])
 
             if resouce_type == "BGM":
                 self.review_audio(content)
@@ -355,12 +315,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     def review_minashigo(self):
         try:
-            resouce_type = self.ui_game_detail_minashigo.comboBox.currentText()
-            resouce_path = self.ui_game_detail_minashigo.textEdit.toPlainText()
+            resouce_type = self.game_ui["minashigo"].comboBox.currentText()
+            resouce_path = self.game_ui["minashigo"].textEdit.toPlainText()
 
-            self.resouce_dict = self.minashigo_utils.get_resource(resouce_type,resouce_path)
+            self.resouce_dict = self.utils["minashigo"].get_resource(resouce_type,resouce_path)
 
-            content = self.minashigo_utils.download_single_file(self.resouce_dict['resource_url'])
+            content = self.utils["minashigo"].download_single_file(self.resouce_dict['resource_url'])
 
             if resouce_type == "角色卡面":
                 self.review_image(content)
@@ -386,10 +346,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def review_tenshoku_maou(self):
         try:
-            resouce_type = self.ui_game_detail_tenshoku_maou.comboBox.currentText()
-            resouce_path = self.ui_game_detail_tenshoku_maou.textEdit.toPlainText()
+            resouce_type = self.game_ui["tenshoku_maou"].comboBox.currentText()
+            resouce_path = self.game_ui["tenshoku_maou"].textEdit.toPlainText()
 
-            self.resouce_dict = self.tenshoku_maou_utils.get_resource(resouce_type,resouce_path)
+            self.resouce_dict = self.utils["tenshoku_maou"].get_resource(resouce_type,resouce_path)
 
             content = self.resouce_dict['content']
 
@@ -406,12 +366,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     def review_sirokurosangokusi(self):
         try:
-            resouce_type = self.ui_game_detail_sirokurosangokusi.comboBox.currentText()
-            resouce_path = self.ui_game_detail_sirokurosangokusi.textEdit.toPlainText()
+            resouce_type = self.game_ui["sirokurosangokusi"].comboBox.currentText()
+            resouce_path = self.game_ui["sirokurosangokusi"].textEdit.toPlainText()
 
-            self.resouce_dict = self.sirokurosangokusi_utils.get_resource(resouce_type,resouce_path)
+            self.resouce_dict = self.utils["sirokurosangokusi"].get_resource(resouce_type,resouce_path)
 
-            content = self.sirokurosangokusi_utils.download_single_file(self.resouce_dict['resource_url'])
+            content = self.utils["sirokurosangokusi"].download_single_file(self.resouce_dict['resource_url'])
 
             if resouce_type in ["hs_anime","hs_cg","头像","立绘","立绘大","表情差分"]:
                 self.review_image(content)
@@ -431,10 +391,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     def review_otogi(self):
         try:
-            resouce_type = self.ui_game_detail_otogi.comboBox.currentText()
-            resouce_path = self.ui_game_detail_otogi.textEdit.toPlainText()
+            resouce_type = self.game_ui["otogi"].comboBox.currentText()
+            resouce_path = self.game_ui["otogi"].textEdit.toPlainText()
 
-            self.resouce_dict = self.otogi_utils.get_resource(resouce_type,resouce_path)
+            self.resouce_dict = self.utils["otogi"].get_resource(resouce_type,resouce_path)
 
             content = self.resouce_dict['content']
 
@@ -477,6 +437,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.review_widget.hide()
         self.ui_review_widget.image_review_label.clear()
+
+    def review_text(self):
+        pass
 
     def review_audio(self,content):
         print("review_audio")
@@ -536,4 +499,16 @@ if __name__ == '__main__':
 
     sys.exit(app.exec())
 
-# nuitka --mingw64 --standalone --onefile --show-progress --plugin-enable=pyqt6 --include-package-data=qt_material --include-qt-plugins=multimedia --windows-icon-from-ico=furau.ico --output-filename=GetWaifu.exe main.py
+# nuitka --mingw64 --standalone --onefile --show-progress --plugin-enable=pyqt6 --include-package-data=qt_material --include-data-dir=C:\Users\tianx\AppData\Local\Programs\Python\Python311\Lib\site-packages\archspec\json=archspec/json --include-data-dir=C:\Users\tianx\AppData\Local\Programs\Python\Python311\Lib\site-packages\UnityPy\resources=UnityPy/resources --include-qt-plugins=multimedia --windows-icon-from-ico=furau.ico --output-filename=GetWaifu.exe main.py
+
+# nuitka --mingw64 \
+#        --onefile \
+#        --show-progress \
+#        --plugin-enable=pyqt6 \
+#        --include-package-data=qt_material \
+#        --include-data-dir=C:\Users\tianx\AppData\Local\Programs\Python\Python311\Lib\site-packages\UnityPy\resources=UnityPy/resources \
+#        --include-data-dir=C:\Users\tianx\AppData\Local\Programs\Python\Python311\Lib\site-packages\archspec\json=archspec/json \
+#        --include-qt-plugins=multimedia \
+#        --windows-icon-from-ico=furau.ico \
+#        --output-filename=GetWaifu.exe \
+#        main.py
