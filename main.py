@@ -230,7 +230,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.game_ui[game].review_button.clicked.connect(partial(self.review_game,game))
             if hasattr(self.game_ui[game], 'download_button'):
                 self.game_ui[game].download_button.clicked.connect(self.download)
-            self.game_ui[game].updateRes.clicked.connect(lambda: self.update_resource(self.utils[game],self.game_ui[game]))
+            self.game_ui[game].updateRes.clicked.connect(partial(self.update_resource, self.utils[game], self.game_ui[game]))
             
     def show_game_detail(self,game_name):
 
